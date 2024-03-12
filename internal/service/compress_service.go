@@ -28,7 +28,7 @@ func NewCompressService(cfg *bootstrap.Container) CompressService {
 }
 
 func (s *CompressServiceImpl) Compress(ctx context.Context, file *multipart.FileHeader, quality int) (*os.File, bool, error) {
-	extArray := []string{".png", ".jpg", ".jpeg"}
+	extArray := []string{string(gocv.PNGFileExt), string(gocv.JPEGFileExt), ".jpeg"}
 	extension := filepath.Ext(file.Filename)
 	extList := strings.Join(extArray, " ")
 	if found := strings.Contains(extList, extension); !found {
@@ -52,7 +52,7 @@ func (s *CompressServiceImpl) Compress(ctx context.Context, file *multipart.File
 	}
 	defer mat.Close()
 
-	buffer, err := gocv.IMEncodeWithParams(gocv.FileExt(extension), mat, []int{gocv.IMWriteJpegQuality, quality})
+	buffer, err := gocv.IMEncodeWithParams(gocv.JPEGFileExt, mat, []int{gocv.IMWriteJpegQuality, quality})
 	if err != nil {
 		return nil, false, errors.New("failed to encode image: " + err.Error())
 	}

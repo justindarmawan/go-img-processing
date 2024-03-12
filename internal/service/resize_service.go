@@ -16,7 +16,7 @@ import (
 )
 
 type ResizeService interface {
-	Resize(ctx context.Context, src *multipart.FileHeader, width int, height int, ar bool, scalar gocv.Scalar) (*os.File, bool, error)
+	Resize(ctx context.Context, src *multipart.FileHeader, width int, height int, ar bool, scalar *gocv.Scalar) (*os.File, bool, error)
 }
 
 type ResizeServiceImpl struct {
@@ -27,8 +27,8 @@ func NewResizeService(cfg *bootstrap.Container) ResizeService {
 	return &ResizeServiceImpl{cfg: cfg}
 }
 
-func (s *ResizeServiceImpl) Resize(ctx context.Context, file *multipart.FileHeader, width int, height int, ar bool, scalar gocv.Scalar) (*os.File, bool, error) {
-	extArray := []string{".png", ".jpg", ".jpeg"}
+func (s *ResizeServiceImpl) Resize(ctx context.Context, file *multipart.FileHeader, width int, height int, ar bool, scalar *gocv.Scalar) (*os.File, bool, error) {
+	extArray := []string{string(gocv.PNGFileExt), string(gocv.JPEGFileExt), ".jpeg"}
 	extension := filepath.Ext(file.Filename)
 	extList := strings.Join(extArray, " ")
 	if found := strings.Contains(extList, extension); !found {
@@ -67,12 +67,15 @@ func (s *ResizeServiceImpl) Resize(ctx context.Context, file *multipart.FileHead
 	gocv.Resize(mat, &resized, image.Point{X: newWidth, Y: newHeight}, 0, 0, gocv.InterpolationArea)
 	defer resized.Close()
 
-	bg := gocv.NewMatWithSize(height, width, gocv.MatTypeCV8UC3)
-	bg.SetTo(scalar)
-	offsetX := (width - newWidth) / 2
-	offsetY := (height - newHeight) / 2
-	region := bg.Region(image.Rect(offsetX, offsetY, offsetX+newWidth, offsetY+newHeight))
-	resized.CopyTo(&region)
+	bg := resized
+	if scalar != nil {
+		bg = gocv.NewMatWithSize(height, width, gocv.MatTypeCV8UC3)
+		bg.SetTo(*scalar)
+		offsetX := (width - newWidth) / 2
+		offsetY := (height - newHeight) / 2
+		region := bg.Region(image.Rect(offsetX, offsetY, offsetX+newWidth, offsetY+newHeight))
+		resized.CopyTo(&region)
+	}
 
 	tempFile, err := os.CreateTemp("", "resized-*"+extension)
 	if err != nil {

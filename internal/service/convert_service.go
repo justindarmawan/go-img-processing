@@ -25,7 +25,7 @@ func NewConvertService(cfg *bootstrap.Container) ConvertService {
 }
 
 func (s *ConvertServiceImpl) Convert(ctx context.Context, file *multipart.FileHeader) (*os.File, bool, error) {
-	if !strings.HasSuffix(strings.ToLower(file.Filename), ".png") {
+	if !strings.HasSuffix(strings.ToLower(file.Filename), string(gocv.PNGFileExt)) {
 		return nil, false, errors.New("only PNG files are accepted")
 	}
 

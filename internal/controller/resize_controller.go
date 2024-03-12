@@ -58,13 +58,16 @@ func (c *ResizeController) Resize(ctx *gin.Context) {
 		return
 	}
 
-	ar, err := strconv.ParseBool(ctx.PostForm("maintainAspectRatio"))
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "maintainAspectRatio value must be true or false"})
-		return
+	ar := false
+	if ctx.PostForm("maintainAspectRatio") != "" {
+		ar, err = strconv.ParseBool(ctx.PostForm("maintainAspectRatio"))
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "maintainAspectRatio value must be true or false"})
+			return
+		}
 	}
 
-	var scalar gocv.Scalar
+	var scalar *gocv.Scalar
 	bgcolor := ctx.PostForm("bgColorRGB")
 	if bgcolor != "" {
 		bgred := strings.Split(bgcolor, ",")[0]
@@ -87,9 +90,10 @@ func (c *ResizeController) Resize(ctx *gin.Context) {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": "blue value must be number"})
 			return
 		}
-		scalar = gocv.NewScalar(float64(blue), float64(green), float64(red), 255)
+		col := gocv.NewScalar(float64(blue), float64(green), float64(red), 255)
+		scalar = &col
 	} else {
-		scalar = gocv.NewScalar(255, 255, 255, 255)
+		scalar = nil
 	}
 
 	outputFile, res, err := c.service.Resize(ctx, file, width, height, ar, scalar)
