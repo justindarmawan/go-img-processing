@@ -30,7 +30,7 @@ func NewConvertController(server *gin.Engine, config *bootstrap.Container, servi
 func (c *ConvertController) Convert(ctx *gin.Context) {
 	file, err := ctx.FormFile("image")
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Failed to get image from form-data"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "failed to get image from form-data"})
 		return
 	}
 
