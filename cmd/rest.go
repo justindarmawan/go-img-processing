@@ -26,6 +26,7 @@ func restCommand(config *bootstrap.Container) *cobra.Command {
 			ginEngine.RemoveExtraSlash = true
 
 			controller.NewHealthController(ginEngine, config)
+			controller.NewConvertController(ginEngine, config)
 
 			port := viper.GetInt("server.port")
 			server := &http.Server{
