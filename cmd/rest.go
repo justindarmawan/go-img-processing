@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go-img-processing/bootstrap"
 	"go-img-processing/internal/controller"
+	"go-img-processing/internal/service"
 	"net/http"
 	"os"
 	"os/signal"
@@ -21,12 +22,15 @@ func restCommand(config *bootstrap.Container) *cobra.Command {
 		Use:   "rest",
 		Short: "Run a web server service",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			// gin.SetMode(gin.ReleaseMode)
 			ginEngine := gin.Default()
 			ginEngine.RedirectTrailingSlash = true
 			ginEngine.RemoveExtraSlash = true
 
+			convertService := service.NewConvertService(config)
+
 			controller.NewHealthController(ginEngine, config)
-			controller.NewConvertController(ginEngine, config)
+			controller.NewConvertController(ginEngine, config, convertService)
 
 			port := viper.GetInt("server.port")
 			server := &http.Server{
@@ -56,7 +60,6 @@ func restCommand(config *bootstrap.Container) *cobra.Command {
 			defer cancel()
 
 			fmt.Println("shuting down the server...")
-			// config.Close
 
 			if err := server.Shutdown(ctx); err != nil && err != http.ErrServerClosed {
 				fmt.Printf("failed to gracefully shut down the server %s", err)
