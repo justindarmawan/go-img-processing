@@ -1,3 +1,5 @@
 *.exe
 .vscode
 go.sum
+*.jpg
+*.png
