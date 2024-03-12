@@ -29,10 +29,12 @@ func restCommand(config *bootstrap.Container) *cobra.Command {
 
 			convertService := service.NewConvertService(config)
 			resizeService := service.NewResizeService(config)
+			compressService := service.NewCompressService(config)
 
 			controller.NewHealthController(ginEngine, config)
 			controller.NewConvertController(ginEngine, config, convertService)
 			controller.NewResizeController(ginEngine, config, resizeService)
+			controller.NewCompressController(ginEngine, config, compressService)
 
 			port := viper.GetInt("server.port")
 			server := &http.Server{
