@@ -59,10 +59,10 @@ func (c *ResizeController) Resize(ctx *gin.Context) {
 	}
 
 	ar := false
-	if ctx.PostForm("maintainAspectRatio") != "" {
-		ar, err = strconv.ParseBool(ctx.PostForm("maintainAspectRatio"))
+	if ctx.PostForm("lockAspectRatio") != "" {
+		ar, err = strconv.ParseBool(ctx.PostForm("lockAspectRatio"))
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "maintainAspectRatio value must be true or false"})
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "lockAspectRatio value must be true or false"})
 			return
 		}
 	}
