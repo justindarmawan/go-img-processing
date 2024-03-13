@@ -7,16 +7,14 @@ import (
 	"image"
 	_ "image/jpeg"
 	_ "image/png"
-	"mime/multipart"
+	"io"
 	"os"
-	"path/filepath"
-	"strings"
 
 	"gocv.io/x/gocv"
 )
 
 type CompressService interface {
-	Compress(ctx context.Context, src *multipart.FileHeader, quality int) (*os.File, bool, error)
+	Compress(ctx context.Context, src io.Reader, quality int) (*os.File, bool, error)
 }
 
 type CompressServiceImpl struct {
@@ -27,21 +25,8 @@ func NewCompressService(cfg *bootstrap.Container) CompressService {
 	return &CompressServiceImpl{cfg: cfg}
 }
 
-func (s *CompressServiceImpl) Compress(ctx context.Context, file *multipart.FileHeader, quality int) (*os.File, bool, error) {
-	extArray := []string{string(gocv.PNGFileExt), string(gocv.JPEGFileExt), ".jpeg"}
-	extension := filepath.Ext(file.Filename)
-	extList := strings.Join(extArray, " ")
-	if found := strings.Contains(extList, extension); !found {
-		return nil, false, errors.New("only PNG, JPG, JPEG files are accepted")
-	}
-
-	src, err := file.Open()
-	if err != nil {
-		return nil, false, errors.New("failed to open file")
-	}
-	defer src.Close()
-
-	img, _, err := image.Decode(src)
+func (s *CompressServiceImpl) Compress(ctx context.Context, file io.Reader, quality int) (*os.File, bool, error) {
+	img, _, err := image.Decode(file)
 	if err != nil {
 		return nil, false, errors.New("failed to decode image: " + err.Error())
 	}

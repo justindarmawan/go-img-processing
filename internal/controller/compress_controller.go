@@ -5,10 +5,12 @@ import (
 	"go-img-processing/internal/service"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"gocv.io/x/gocv"
 )
 
 type CompressController struct {
@@ -46,7 +48,22 @@ func (c *CompressController) Compress(ctx *gin.Context) {
 		return
 	}
 
-	outputFile, res, err := c.service.Compress(ctx, file, quality)
+	extArray := []string{string(gocv.PNGFileExt), string(gocv.JPEGFileExt), ".jpeg"}
+	extension := filepath.Ext(file.Filename)
+	extList := strings.Join(extArray, " ")
+	if found := strings.Contains(extList, extension); !found {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "only PNG, JPG, JPEG files are accepted"})
+		return
+	}
+
+	src, err := file.Open()
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "failed to open file"})
+		return
+	}
+	defer src.Close()
+
+	outputFile, res, err := c.service.Compress(ctx, src, quality)
 	if !res {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

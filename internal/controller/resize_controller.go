@@ -53,6 +53,11 @@ func (c *ResizeController) Resize(ctx *gin.Context) {
 		return
 	}
 
+	if width*height > 7680*4320 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "pixel more than 8K (7680*4320)"})
+		return
+	}
+
 	if height <= 0 {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "height value must be greater than 0"})
 		return
