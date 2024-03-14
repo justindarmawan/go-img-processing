@@ -5,6 +5,7 @@ import (
 	"go-img-processing/internal/service"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -101,7 +102,22 @@ func (c *ResizeController) Resize(ctx *gin.Context) {
 		scalar = nil
 	}
 
-	outputFile, res, err := c.service.Resize(ctx, file, width, height, ar, scalar)
+	extArray := []string{string(gocv.PNGFileExt), string(gocv.JPEGFileExt), ".jpeg"}
+	extension := filepath.Ext(file.Filename)
+	extList := strings.Join(extArray, " ")
+	if found := strings.Contains(extList, extension); !found {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "only PNG, JPG, JPEG files are accepted"})
+		return
+	}
+
+	src, err := file.Open()
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "failed to open file"})
+		return
+	}
+	defer src.Close()
+
+	outputFile, res, err := c.service.Resize(ctx, src, width, height, ar, scalar, extension)
 	if !res {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

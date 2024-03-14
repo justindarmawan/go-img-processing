@@ -7,16 +7,14 @@ import (
 	"image"
 	_ "image/jpeg"
 	_ "image/png"
-	"mime/multipart"
+	"io"
 	"os"
-	"path/filepath"
-	"strings"
 
 	"gocv.io/x/gocv"
 )
 
 type ResizeService interface {
-	Resize(ctx context.Context, src *multipart.FileHeader, width int, height int, ar bool, scalar *gocv.Scalar) (*os.File, bool, error)
+	Resize(ctx context.Context, file io.Reader, width int, height int, ar bool, scalar *gocv.Scalar, extension string) (*os.File, bool, error)
 }
 
 type ResizeServiceImpl struct {
@@ -27,21 +25,8 @@ func NewResizeService(cfg *bootstrap.Container) ResizeService {
 	return &ResizeServiceImpl{cfg: cfg}
 }
 
-func (s *ResizeServiceImpl) Resize(ctx context.Context, file *multipart.FileHeader, width int, height int, ar bool, scalar *gocv.Scalar) (*os.File, bool, error) {
-	extArray := []string{string(gocv.PNGFileExt), string(gocv.JPEGFileExt), ".jpeg"}
-	extension := filepath.Ext(file.Filename)
-	extList := strings.Join(extArray, " ")
-	if found := strings.Contains(extList, extension); !found {
-		return nil, false, errors.New("only PNG, JPG, JPEG files are accepted")
-	}
-
-	src, err := file.Open()
-	if err != nil {
-		return nil, false, errors.New("failed to open file")
-	}
-	defer src.Close()
-
-	img, _, err := image.Decode(src)
+func (s *ResizeServiceImpl) Resize(ctx context.Context, file io.Reader, width int, height int, ar bool, scalar *gocv.Scalar, extension string) (*os.File, bool, error) {
+	img, _, err := image.Decode(file)
 	if err != nil {
 		return nil, false, errors.New("failed to decode image: " + err.Error())
 	}

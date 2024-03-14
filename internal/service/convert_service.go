@@ -5,15 +5,13 @@ import (
 	"errors"
 	"go-img-processing/bootstrap"
 	"io"
-	"mime/multipart"
 	"os"
-	"strings"
 
 	"gocv.io/x/gocv"
 )
 
 type ConvertService interface {
-	Convert(ctx context.Context, src *multipart.FileHeader) (*os.File, bool, error)
+	Convert(ctx context.Context, file io.Reader) (*os.File, bool, error)
 }
 
 type ConvertServiceImpl struct {
@@ -24,17 +22,7 @@ func NewConvertService(cfg *bootstrap.Container) ConvertService {
 	return &ConvertServiceImpl{cfg: cfg}
 }
 
-func (s *ConvertServiceImpl) Convert(ctx context.Context, file *multipart.FileHeader) (*os.File, bool, error) {
-	if !strings.HasSuffix(strings.ToLower(file.Filename), string(gocv.PNGFileExt)) {
-		return nil, false, errors.New("only PNG files are accepted")
-	}
-
-	src, err := file.Open()
-	if err != nil {
-		return nil, false, errors.New("failed to open file")
-	}
-	defer src.Close()
-
+func (s *ConvertServiceImpl) Convert(ctx context.Context, file io.Reader) (*os.File, bool, error) {
 	dst, err := os.CreateTemp("", "uploaded-*.png")
 	if err != nil {
 		return nil, false, errors.New("failed to create temporary file")
@@ -44,7 +32,7 @@ func (s *ConvertServiceImpl) Convert(ctx context.Context, file *multipart.FileHe
 		os.Remove(dst.Name())
 	}()
 
-	_, err = io.Copy(dst, src)
+	_, err = io.Copy(dst, file)
 	if err != nil {
 		return nil, false, errors.New("failed to copy file contents")
 	}

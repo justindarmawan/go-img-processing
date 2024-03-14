@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"gocv.io/x/gocv"
 )
 
 type ConvertController struct {
@@ -34,7 +35,19 @@ func (c *ConvertController) Convert(ctx *gin.Context) {
 		return
 	}
 
-	outputFile, res, err := c.service.Convert(ctx, file)
+	if !strings.HasSuffix(strings.ToLower(file.Filename), string(gocv.PNGFileExt)) {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "only PNG files are accepted"})
+		return
+	}
+
+	src, err := file.Open()
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "failed to open file"})
+		return
+	}
+	defer src.Close()
+
+	outputFile, res, err := c.service.Convert(ctx, src)
 	if !res {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
