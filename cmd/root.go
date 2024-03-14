@@ -12,6 +12,7 @@ func Execute() error {
 
 	root.AddCommand(
 		restCommand(config),
+		testCommand(),
 	)
 
 	return root.Execute()
