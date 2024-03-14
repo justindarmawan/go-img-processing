@@ -36,5 +36,6 @@ COPY . .
 RUN go mod download
 RUN go mod tidy
 
+RUN go test ./internal/test -v
 RUN go build -o app
 CMD ["./app", "rest"]
