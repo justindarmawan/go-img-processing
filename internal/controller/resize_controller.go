@@ -82,11 +82,19 @@ func (c *ResizeController) Resize(ctx *gin.Context) {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": "red value must be number"})
 			return
 		}
+		if red < 0 || red > 255 {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "red value must between 0-255"})
+			return
+		}
 
 		bggreen := strings.Split(bgcolor, ",")[1]
 		green, err := strconv.Atoi(bggreen)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": "green value must be number"})
+			return
+		}
+		if green < 0 || green > 255 {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "green value must between 0-255"})
 			return
 		}
 
@@ -96,6 +104,11 @@ func (c *ResizeController) Resize(ctx *gin.Context) {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": "blue value must be number"})
 			return
 		}
+		if blue < 0 || blue > 255 {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "blue value must between 0-255"})
+			return
+		}
+
 		col := gocv.NewScalar(float64(blue), float64(green), float64(red), 255)
 		scalar = &col
 	} else {
