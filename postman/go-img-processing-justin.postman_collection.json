@@ -17,19 +17,19 @@
 						{
 							"key": "image",
 							"type": "file",
-							"src": []
+							"src": "/C:/Users/jdarm/OneDrive/Desktop/data bca/foto.png"
 						}
 					]
 				},
 				"url": {
-					"raw": "http://localhost:8080/compress/",
+					"raw": "http://localhost:8080/convert/",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
-						"compress",
+						"convert",
 						""
 					]
 				}
@@ -72,14 +72,14 @@
 					]
 				},
 				"url": {
-					"raw": "http://localhost:8080/compress/",
+					"raw": "http://localhost:8080/resize/",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
-						"compress",
+						"resize",
 						""
 					]
 				}
