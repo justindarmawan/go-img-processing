@@ -9,9 +9,9 @@ import (
 	"testing"
 )
 
-func TestCompress(t *testing.T) {
+func TestConvert(t *testing.T) {
 	config := &bootstrap.Container{}
-	compressService := service.NewCompressService(config)
+	convertService := service.NewConvertService(config)
 
 	ctx := context.Background()
 	imageFile, err := os.Open("../../static/img/balloon.png")
@@ -21,20 +21,19 @@ func TestCompress(t *testing.T) {
 	defer imageFile.Close()
 
 	var reader io.Reader = imageFile
-	quality := 80
 
-	outputFile, res, err := compressService.Compress(ctx, reader, quality)
+	outputFile, res, err := convertService.Convert(ctx, reader)
 
 	if err != nil {
-		t.Errorf("compress failed: %v", err)
+		t.Errorf("convert failed: %v", err)
 	}
 
 	if !res {
-		t.Errorf("compression was not successful")
+		t.Errorf("conversion was not successful")
 	}
 
 	if outputFile == nil {
-		t.Errorf("temporary file not created")
+		t.Errorf("output file not created")
 	} else {
 		defer os.Remove(outputFile.Name())
 	}
