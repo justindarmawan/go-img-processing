@@ -1,0 +1,125 @@
+{
+	"info": {
+		"_postman_id": "2a9ecc85-66ab-468a-b695-59306e70800e",
+		"name": "go-img-processing-justin",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13428251"
+	},
+	"item": [
+		{
+			"name": "convert",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": []
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/compress/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"compress",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "resize",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": []
+						},
+						{
+							"key": "width",
+							"value": "300",
+							"type": "text"
+						},
+						{
+							"key": "height",
+							"value": "300",
+							"type": "text"
+						},
+						{
+							"key": "lockAspectRatio",
+							"value": "true",
+							"type": "text"
+						},
+						{
+							"key": "bgColorRGB",
+							"value": "255,255,255",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/compress/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"compress",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "compress",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": []
+						},
+						{
+							"key": "quality",
+							"value": "80",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/compress/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"compress",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
