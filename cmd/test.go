@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
 
 	"github.com/spf13/cobra"
@@ -13,13 +12,13 @@ func testCommand() *cobra.Command {
 		Use:   "test",
 		Short: "Test service",
 		Run: func(cmd *cobra.Command, args []string) {
-			cmdd := exec.Command("go", "test", "./internal/test", "-v")
-			cmdd.Stdout = os.Stdout
-			cmdd.Stderr = os.Stderr
+			cmdTest := exec.Command("sh", "-c", "go clean -testcache && go test ./internal/test -v")
+			cmdTest.Stdout = cmd.OutOrStdout()
+			cmdTest.Stderr = cmd.OutOrStderr()
 
-			if err := cmdd.Run(); err != nil {
-				fmt.Println("Error running tests:", err)
-				os.Exit(1)
+			if err := cmdTest.Run(); err != nil {
+				fmt.Println("error running tests:", err)
+				return
 			}
 		},
 	}
